@@ -3,6 +3,7 @@ from flask import Blueprint, redirect, url_for
 from flask import request, render_template
 from postmanager.manager import PostManager
 from postmanager.proxy import BucketProxy
+from postmanager.exception import PostManagerException
 
 main = Blueprint("main", __name__)
 
@@ -44,19 +45,26 @@ def single_post(post_id):
     # Return single post 
     if request.method == 'GET':
 
-        posts = post_manager.get_by_id(post_id)
+        try:
 
-        post = {
-            'metaData':{
-                'id':post_id,
-                'title':'Coolest'
-            },
-            'content':{
-                'Header':'Coolest'
+            posts = post_manager.get_by_id(post_id)
+
+            post = {
+                'metaData':{
+                    'id':post_id,
+                    'title':'Coolest'
+                },
+                'content':{
+                    'Header':'Coolest'
+                }
             }
-        }
 
-        posts.append(post)
+            posts.append(post)
+        except PostManagerException:
+            post = {
+                'error': True,
+                'message': 'Post not found'
+            }
 
         return render_template("post.html", post=post)
 
