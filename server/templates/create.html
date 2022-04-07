@@ -68,7 +68,8 @@
       response
         .json()
         .then((data) => {
-          console.log(data);
+          const url = `/create/success/${data.meta_data.id}`;
+          window.location.assign(url);
         })
         .catch((e) => {
           console.log(e);

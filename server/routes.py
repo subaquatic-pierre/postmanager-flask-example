@@ -32,7 +32,9 @@ def list_posts():
             post = post_manager.get_by_id(meta['id'])
 
             posts.append(post)
-            
+
+        print(posts)
+
         return render_template("posts.html", posts=posts)
 
     elif request.method == 'POST':
@@ -73,24 +75,15 @@ def single_post(post_id):
 
         try:
 
-            posts = post_manager.get_by_id(post_id)
+            post = post_manager.get_by_id(post_id)
 
-            post = {
-                'metaData':{
-                    'id':post_id,
-                    'title':'Coolest'
-                },
-                'content':{
-                    'Header':'Coolest'
-                }
-            }
-
-            posts.append(post)
         except PostManagerException:
             post = {
                 'error': True,
                 'message': 'Post not found'
             }
+
+            return jsonify(post)
 
         return render_template("post.html", post=post)
 
@@ -119,10 +112,109 @@ def single_post(post_id):
         return redirect(url_for("success.html", data=data))
 
 
-@main.route("/success")
-def success():
-    data = request.args.get('data')
-    return render_template("success.html", data=data)
+@main.route("/create/<string:status>/<string:post_id>")
+def create_success(status,post_id):
+    if status == 'fail':
+        data = {
+                'title': 'Create Failure',
+                'data':{
+                    'error': True,
+                    'message':"Failed from the frontend",
+                }
+            }
+
+        return render_template("confirmation.html", data=data)
+    else:
+        try:
+            post = post_manager.get_by_id(post_id)
+            data = {
+                'title': "Create Success",
+                'data': {
+                    'post':post.to_json()
+                }
+            }
+            return render_template("confirmation.html", data=data)
+
+        except PostManagerException as e:
+            data = {
+                'title': 'Create Failure',
+                'data':{
+                    'error': True,
+                    'message': str(e),
+                }
+            }
+
+            return render_template("confirmation.html", data=data)
+
+@main.route("/delete/<string:status>/<string:post_id>")
+def delete_success(status,post_id):
+    if status == 'fail':
+        data = {
+                'title': 'Create Failure',
+                'data':{
+                    'error': True,
+                    'message':"Failed from the frontend",
+                }
+            }
+
+        return render_template("confirmation.html", data=data)
+    else:
+        try:
+            data = {
+                'title': "Delete Success",
+                'data': {
+                    'post_id':post_id,
+                    'delete': True
+                }
+            }
+            return render_template("confirmation.html", data=data)
+
+        except PostManagerException as e:
+            data = {
+                'title': 'Delete Failure',
+                'data':{
+                    'error': True,
+                    'message': str(e),
+                }
+            }
+
+            return render_template("confirmation.html", data=data)
+
+@main.route("/update/<string:status>/<string:post_id>")
+def update_success(status,post_id):
+    if status == 'fail':
+        data = {
+                'title': 'Update Failure',
+                'data':{
+                    'error': True,
+                    'message':"Failed from the frontend",
+                }
+            }
+
+        return render_template("confirmation.html", data=data)
+
+    else:
+        try:
+            post = post_manager.get_by_id(post_id)
+            data = {
+                'title': "Update Success",
+                'data': {
+                    post:'post'
+                }
+            }
+            return render_template("confirmation.html", data=data)
+
+        except PostManagerException as e:
+            data = {
+                'title': 'Create Failure',
+                'data':{
+                    'error': True,
+                    'message': str(e),
+                }
+            }
+
+            return render_template("confirmation.html", data=data)
+
 
 @main.route("/posts/create")
 def create():
