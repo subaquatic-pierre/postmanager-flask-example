@@ -6,6 +6,7 @@ from postmanager.manager import PostManager
 from postmanager.proxy import BucketProxy
 from postmanager.exception import PostManagerException
 from postmanager.meta import PostMeta
+from postmanager.post import Post
 
 main = Blueprint("main", __name__)
 
@@ -24,21 +25,14 @@ def home():
 def list_posts():
     if request.method == 'GET':
             
-        posts: List = post_manager.index
+        posts: List(Post) = []
+        posts_meta: List = post_manager.index
 
-        post = {
-            'metaData':{
-                'id':0,
-                'title':'Coolest'
-            },
-            'content':{
-                'Header':'Coolest'
-            }
-        }
+        for meta in posts_meta:
+            post = post_manager.get_by_id(meta['id'])
 
-        posts.append(post)
-
-
+            posts.append(post)
+            
         return render_template("posts.html", posts=posts)
 
     elif request.method == 'POST':
@@ -50,14 +44,12 @@ def list_posts():
             new_post_id = post_manager._get_latest_id()
 
             # Get raw data from request
-            form_meta_data = form_data.get('metaData',{'title':'Unknown title'})
-            form_content = form_data.get('content',{'Header':'Unkown Content'})
+            post_meta_data = form_data.get('metaData',{'title':'Unknown title'})
+            post_title = post_meta_data.get('title')
+            post_content = form_data.get('content',{'Header':'Unkown Content'})
 
-            form_meta_data['id'] = new_post_id
-            post_meta_data = PostMeta.from_json(form_meta_data)
-
-
-            new_post = post_manager.create_post(post_meta_data, form_content)
+            post_meta_data = post_manager.create_meta(post_title)
+            new_post = post_manager.create_post(post_meta_data, post_content)
 
             post_manager.save_post(new_post)
 
@@ -69,24 +61,6 @@ def list_posts():
                 'message': str(e)
             }
             return jsonify(data)
-
-        # formData = dict()
-
-        # print(formData)
-
-        # data = {
-        #     # 'request': request,
-        #     'post_created': True,
-        #     'post':{
-        #         'post_id':1,
-        #         'title':'Cool Title'
-        #     }
-        # }
-
-        # # return redirect(url_for('main.success',data=data))
-        # return jsonify(data)
-
-
 
 
 # Post with ID route

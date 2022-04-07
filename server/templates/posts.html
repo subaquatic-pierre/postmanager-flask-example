@@ -28,14 +28,11 @@
       >
         <title>Placeholder</title>
         <rect width="100%" height="100%" fill="#55595c" />
-        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
+        <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{post.title}}</text>
       </svg>
 
       <div class="card-body">
-        <p class="card-text">
-          This is a wider card with supporting text below as a natural lead-in
-          to additional content. This content is a little bit longer.
-        </p>
+        <p class="card-text">{{post.content.text}}</p>
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
             <button type="button" class="btn btn-sm btn-outline-secondary">
@@ -45,12 +42,47 @@
               Edit
             </button>
           </div>
-          <small class="text-muted">9 mins</small>
+          <small
+            id="{{post.id}}-timestamp"
+            data-timestamp="{{post.meta_data.timestamp}}"
+            data-id="{{post.id}}"
+            class="text-muted timestamp-display"
+          ></small>
         </div>
       </div>
     </div>
   </div>
   {% endfor %}
 </div>
+
+<script>
+  window.addEventListener("load", () => {
+    const postData = [];
+
+    const allTimestampSpans = document.querySelectorAll(
+      "small.timestamp-display"
+    );
+
+    allTimestampSpans.forEach((el) => {
+      const timestamp = el.dataset.timestamp;
+      const id = el.dataset.id;
+
+      const post = {
+        id,
+        timestamp,
+      };
+
+      postData.push(post);
+    });
+
+    postData.forEach((post) => {
+      const el = document.getElementById(`${post.id}-timestamp`);
+
+      const createdAt = new Date(Number(post.timestamp) * 1000);
+
+      el.innerHTML = `Created: ${createdAt.toDateString()}`;
+    });
+  });
+</script>
 
 {% endblock %}
