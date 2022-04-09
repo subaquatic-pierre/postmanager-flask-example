@@ -78,15 +78,15 @@
 
       if (resData.error) {
         const data = {
-          title: "Create Failure",
-          data: error,
+          title: resData.title,
+          data: resData.data,
         };
         window.location.assign(generateValidateUrl(data));
       }
 
       const validateData = {
-        title: "Create Success",
-        data: resData,
+        title: resData.title,
+        data: resData.data,
       };
 
       window.location.assign(generateValidateUrl(validateData));

@@ -115,16 +115,16 @@
         const resData = await response.json();
 
         if (resData.error) {
-          const data = {
-            title: "Delete Failure",
-            data: error,
+          const errorData = {
+            title: resData.title,
+            data: resData.data,
           };
-          window.location.assign(generateValidateUrl(data));
+          window.location.assign(generateValidateUrl(errorData));
         }
 
         const validateData = {
-          title: "Delete Success",
-          data: resData,
+          title: resData.title,
+          data: resData.data,
         };
 
         window.location.assign(generateValidateUrl(validateData));

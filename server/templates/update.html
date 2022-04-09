@@ -79,9 +79,17 @@
       const response = await putRequest(updateUrl, data);
       const resData = await response.json();
 
+      if (resData.error) {
+        const data = {
+          title: resData.title,
+          data: resData.data,
+        };
+        window.location.assign(generateValidateUrl(data));
+      }
+
       const validateData = {
-        title: "Update Success",
-        data: resData,
+        title: resData.title,
+        data: resData.data,
       };
 
       window.location.assign(generateValidateUrl(validateData));
