@@ -1,3 +1,4 @@
+from crypt import methods
 import json
 from typing import List
 from flask import Blueprint, redirect, url_for
@@ -32,8 +33,6 @@ def list_posts():
             post = post_manager.get_by_id(meta['id'])
 
             posts.append(post)
-
-        print(posts)
 
         return render_template("posts.html", posts=posts)
 
@@ -112,117 +111,20 @@ def single_post(post_id):
         return redirect(url_for("success.html", data=data))
 
 
-@main.route("/create/<string:status>/<string:post_id>")
-def create_success(status,post_id):
-    if status == 'fail':
-        data = {
-                'title': 'Create Failure',
-                'data':{
-                    'error': True,
-                    'message':"Failed from the frontend",
-                }
-            }
-
-        return render_template("confirmation.html", data=data)
-    else:
-        try:
-            post = post_manager.get_by_id(post_id)
-            data = {
-                'title': "Create Success",
-                'data': {
-                    'post':post.to_json()
-                }
-            }
-            return render_template("confirmation.html", data=data)
-
-        except PostManagerException as e:
-            data = {
-                'title': 'Create Failure',
-                'data':{
-                    'error': True,
-                    'message': str(e),
-                }
-            }
-
-            return render_template("confirmation.html", data=data)
-
-@main.route("/delete/<string:status>/<string:post_id>")
-def delete_success(status,post_id):
-    if status == 'fail':
-        data = {
-                'title': 'Create Failure',
-                'data':{
-                    'error': True,
-                    'message':"Failed from the frontend",
-                }
-            }
-
-        return render_template("confirmation.html", data=data)
-    else:
-        try:
-            data = {
-                'title': "Delete Success",
-                'data': {
-                    'post_id':post_id,
-                    'delete': True
-                }
-            }
-            return render_template("confirmation.html", data=data)
-
-        except PostManagerException as e:
-            data = {
-                'title': 'Delete Failure',
-                'data':{
-                    'error': True,
-                    'message': str(e),
-                }
-            }
-
-            return render_template("confirmation.html", data=data)
-
-@main.route("/update/<string:status>/<string:post_id>")
-def update_success(status,post_id):
-    if status == 'fail':
-        data = {
-                'title': 'Update Failure',
-                'data':{
-                    'error': True,
-                    'message':"Failed from the frontend",
-                }
-            }
-
-        return render_template("confirmation.html", data=data)
-
-    else:
-        try:
-            post = post_manager.get_by_id(post_id)
-            data = {
-                'title': "Update Success",
-                'data': {
-                    post:'post'
-                }
-            }
-            return render_template("confirmation.html", data=data)
-
-        except PostManagerException as e:
-            data = {
-                'title': 'Create Failure',
-                'data':{
-                    'error': True,
-                    'message': str(e),
-                }
-            }
-
-            return render_template("confirmation.html", data=data)
-
-
 @main.route("/posts/create")
 def create():
     return render_template("create.html")
 
 
+@main.route("/validate")
+def validate():
+    req_data = request.args.get('data')
 
-# # Show about privacy policy template
-# @main.route("/policy")
-# def policy():
-#     return render_template("main/policy.html", title="Privacy Policy")
+    data = {
+        'title': req_data.get('title'),
+        'data':req_data.get('data')
+    }
+    return render_template("validate.html", data=data)
+
+
+

@@ -47,39 +47,49 @@
 
 <script>
   const form = document.getElementById("postForm");
-  const url = "/posts";
 
-  const postData = async (data) => {
+  const postRequest = async (url, data) => {
+    return fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+  };
+
+  const generateValidateUrl = (data) => {
+    const baseUrl = "/validate?data=";
+    return baseUrl + JSON.stringify(data);
+  };
+
+  const handlePostRequest = async (data) => {
+    const createUrl = "/posts";
     try {
-      const response = await fetch(url, {
-        method: "POST", // *GET, POST, PUT, DELETE, etc.
-        mode: "cors", // no-cors, *cors, same-origin
-        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: "same-origin", // include, *same-origin, omit
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        redirect: "follow", // manual, *follow, error
-        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify(data), // body data type must match "Content-Type" header
-      });
+      const response = await postRequest(createUrl, data);
+      const resData = await response.json();
 
-      response
-        .json()
-        .then((data) => {
-          const url = `/create/success/${data.meta_data.id}`;
-          window.location.assign(url);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    } catch (e) {
-      console.log(e);
+      const data = {
+        title: "Create Success",
+        data: resData,
+      };
+      window.location.assign(generateValidateUrl(data));
+    } catch (error) {
+      const data = {
+        title: "Create Failure",
+        data: resData,
+      };
+      window.location.assign(generateValidateUrl(data));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmitClick = (e) => {
     event.preventDefault();
 
     const postTitle = document.getElementById("postTitle");
@@ -94,10 +104,10 @@
       },
     };
 
-    postData(data);
+    handlePostRequest(data);
   };
 
-  form.addEventListener("submit", handleSubmit);
+  form.addEventListener("submit", handleSubmitClick);
 </script>
 
 {% endblock main %}
