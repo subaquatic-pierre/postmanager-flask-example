@@ -12,12 +12,66 @@
       <p class="lead text-muted">Data:</p>
       <p class="">{{post}}</p>
       <p>
-        <a href="#" class="btn btn-primary my-2">Delete</a>
-        <a href="#" class="btn btn-secondary my-2">Update</a>
+        <button id="deleteButton" class="btn btn-danger my-2">Delete</button>
+        <a href="/post/update/{{post.id}}" class="btn btn-secondary my-2"
+          >Edit</a
+        >
       </p>
       {% endif %}
     </div>
   </div>
 </section>
+
+<script>
+  const generateValidateUrl = (data) => {
+    const baseUrl = "/validate?data=";
+    return baseUrl + JSON.stringify(data);
+  };
+
+  const deleteRequest = (url) => {
+    return fetch(url, {
+      method: "DELETE", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    });
+  };
+
+  const handleDelete = async () => {
+    const postId = "{{post.id}}";
+    const deleteUrl = `/posts/${postId}`;
+
+    try {
+      const response = await deleteRequest(deleteUrl);
+      const resData = await response.json();
+
+      if (resData.error) {
+        const data = {
+          title: "Delete Failure",
+          data: error,
+        };
+        window.location.assign(generateValidateUrl(data));
+      }
+
+      const validateData = {
+        title: "Delete Success",
+        data: resData,
+      };
+
+      window.location.assign(generateValidateUrl(validateData));
+    } catch (error) {
+      const validateData = {
+        title: "Delete Failure",
+        data: error,
+      };
+
+      window.location.assign(generateValidateUrl(validateData));
+    }
+  };
+
+  document.getElementById("deleteButton").onclick = handleDelete;
+</script>
 
 {% endblock main %}

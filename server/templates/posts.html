@@ -35,20 +35,20 @@
         <p class="card-text">{{post.content.text}}</p>
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
-            <button
+            <a
               type="button"
               href="/posts/{{post.id}}"
               class="btn btn-sm btn-outline-secondary"
             >
               View
-            </button>
-            <button
+            </a>
+            <a
               type="button"
               href="/posts/update/{{post.id}}"
               class="btn btn-sm btn-outline-secondary"
             >
               Edit
-            </button>
+            </a>
             <button
               type="button"
               id="{{post.id}}-deleteButton"
@@ -147,18 +147,9 @@
       // Add delete button handler to each post
       const deleteButton = document.getElementById(`${post.id}-deleteButton`);
       deleteButton.onclick = () => {
-        console.log(`delete button clicked with id ${post.id}`);
         handleDelete(post.id);
       };
     });
-
-    // postData.forEach((post) => {
-    //   const el = document.getElementById(`${post.id}-timestamp`);
-
-    //   const createdAt = new Date(Number(post.timestamp) * 1000);
-
-    //   el.innerHTML = `Created: ${createdAt.toDateString()}`;
-    // });
   });
 </script>
 

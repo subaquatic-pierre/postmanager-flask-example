@@ -2,7 +2,7 @@
 
 <div class="py-5 text-center">
   <h2>Create Post</h2>
-  <p class="lead">Create new post below</p>
+  <p class="lead">Update post below</p>
 </div>
 
 <form class="row g-3" id="postForm">
@@ -37,8 +37,9 @@
         rows="5"
         id="postContent"
         name="postContent"
-        value="{{post.content}}"
-      ></textarea>
+      >
+{{post.content.text}}</textarea
+      >
     </div>
   </div>
 
@@ -78,17 +79,19 @@
       const response = await putRequest(updateUrl, data);
       const resData = await response.json();
 
-      const data = {
+      const validateData = {
         title: "Update Success",
         data: resData,
       };
-      window.location.assign(generateValidateUrl(data));
+
+      window.location.assign(generateValidateUrl(validateData));
     } catch (error) {
-      const data = {
+      const errorData = {
         title: "Update Failure",
-        data: resData,
+        data: error,
       };
-      window.location.assign(generateValidateUrl(data));
+
+      window.location.assign(generateValidateUrl(errorData));
     }
   };
 

@@ -87,7 +87,7 @@ def single_post(post_id):
 
             post = post_manager.get_by_id(post_id)
 
-            new_meta = PostMeta.from_json({'id':post.id,**data.get('metaData')})
+            new_meta = PostMeta.from_json({'id':post.id,'timestamp':post.meta_data.timestamp,**data.get('metaData')})
 
             post.content = data.get('content')
             post.meta_data = new_meta
@@ -96,7 +96,7 @@ def single_post(post_id):
 
             data = {
                 'title': 'Update Post Success',
-                'data': post
+                'data': post.to_json()
             }
 
             return jsonify(data)
