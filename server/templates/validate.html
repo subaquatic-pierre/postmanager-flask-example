@@ -1,17 +1,29 @@
 {% extends 'layout.html' %} {% block main %}
 
-<section class="py-5 text-center container">
+<section class="py-5 container">
   <div class="row py-lg-5">
     <div class="col-lg-6 col-md-8 mx-auto">
-      <h1 class="fw-light">{{data.title}}</h1>
+      <h1 class="fw-light text-center">{{data.title}}</h1>
       <p class="lead text-muted">Data:</p>
-      <p class="">{{data.data}}</p>
-      <p>
+      <div data-data="{{ json_dump }}" id="dataDiv">
+        <pre id="preTag"></pre>
+      </div>
+      <p class="text-center">
         <a href="/" class="btn btn-primary my-2">Home</a>
         <a href="/posts" class="btn btn-secondary my-2">Posts</a>
       </p>
     </div>
   </div>
 </section>
+
+<script>
+  window.addEventListener("load", () => {
+    const dataDiv = document.getElementById("dataDiv");
+    const data = dataDiv.dataset.data;
+
+    const preTag = document.getElementById("preTag");
+    preTag.innerHTML = JSON.stringify(JSON.parse(data).data, null, 4);
+  });
+</script>
 
 {% endblock main %}

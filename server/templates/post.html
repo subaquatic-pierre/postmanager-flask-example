@@ -1,23 +1,23 @@
 {% extends 'layout.html' %} {% block main %}
 
-<section class="py-5 text-center container">
+<section class="py-5 container">
   <div class="row py-lg-5">
     <div class="col-lg-6 col-md-8 mx-auto">
-      {% if post.error == true %}
-      <h1 class="fw-light">There was an error</h1>
+      <h1 class="fw-light text-center">
+        Post Title: {{data.post.meta_data.title}}
+      </h1>
       <p class="lead text-muted">Data:</p>
-      <p class="">{{post.message}}</p>
-      {% else %}
-      <h1 class="fw-light">Post Data</h1>
-      <p class="lead text-muted">Data:</p>
-      <p class="">{{post}}</p>
-      <p>
+      <div data-data="{{ json_dump }}" id="dataDiv">
+        <pre id="preTag"></pre>
+      </div>
+      <p class="text-center">
         <button id="deleteButton" class="btn btn-danger my-2">Delete</button>
-        <a href="/post/update/{{post.id}}" class="btn btn-secondary my-2"
+        <a
+          href="/posts/update/{{data.post.meta_data.id}}"
+          class="btn btn-secondary my-2"
           >Edit</a
         >
       </p>
-      {% endif %}
     </div>
   </div>
 </section>
@@ -40,7 +40,7 @@
   };
 
   const handleDelete = async () => {
-    const postId = "{{post.id}}";
+    const postId = "{{data.post.meta_data.id}}";
     const deleteUrl = `/posts/${postId}`;
 
     try {
@@ -72,6 +72,14 @@
   };
 
   document.getElementById("deleteButton").onclick = handleDelete;
+
+  window.addEventListener("load", () => {
+    const dataDiv = document.getElementById("dataDiv");
+    const data = dataDiv.dataset.data;
+
+    const preTag = document.getElementById("preTag");
+    preTag.innerHTML = JSON.stringify(JSON.parse(data).post, null, 4);
+  });
 </script>
 
 {% endblock main %}

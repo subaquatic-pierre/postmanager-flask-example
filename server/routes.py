@@ -55,7 +55,7 @@ def list_posts():
 
             post_manager.save_post(new_post)
 
-            data = {"title": "Create Post Success", "data": post.to_json()}
+            data = {"title": "Create Post Success", "data": new_post.to_json()}
 
             return jsonify(data)
 
@@ -73,7 +73,9 @@ def single_post(post_id):
         try:
             post = post_manager.get_by_id(post_id)
 
-            return render_template("post.html", post=post)
+            data = {"title": "Post Data", "post": post.to_json()}
+
+            return render_template("post.html", data=data, json_dump=json.dumps(data))
 
         except PostManagerException as e:
             data = {"error": True, "title": "Post not Found", "data": str(e)}
@@ -107,7 +109,10 @@ def single_post(post_id):
         try:
             post_manager.delete_post(post_id)
 
-            data = {"title": "Post Deleted", "data": {"post_id": post_id}}
+            data = {
+                "title": "Post Deleted",
+                "data": {"deleted": True, "post_id": post_id},
+            }
 
             return jsonify(data)
 
@@ -140,4 +145,4 @@ def validate():
 
     data = {"title": req_data.get("title"), "data": req_data.get("data")}
 
-    return render_template("validate.html", data=data)
+    return render_template("validate.html", data=data, json_dump=json.dumps(data))
