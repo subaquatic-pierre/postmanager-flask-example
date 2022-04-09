@@ -11,7 +11,7 @@ from postmanager.post import Post
 
 main = Blueprint("main", __name__)
 
-bucket_proxy = BucketProxy("postmanager-flask-example", "/post")
+bucket_proxy = BucketProxy("postmanager-flask-example", "post/")
 post_manager = PostManager(bucket_proxy, "post")
 
 
@@ -41,9 +41,6 @@ def list_posts():
         try:
             form_data = json.loads(request.get_data().decode('utf-8'))
 
-            # Get new ID from post manager
-            new_post_id = post_manager._get_latest_id()
-
             # Get raw data from request
             post_meta_data = form_data.get('metaData',{'title':'Unknown title'})
             post_title = post_meta_data.get('title')
@@ -61,6 +58,7 @@ def list_posts():
                 'error':True,
                 'message': str(e)
             }
+
             return jsonify(data)
 
 
@@ -68,62 +66,97 @@ def list_posts():
 @main.route("/posts/<string:post_id>", methods=['GET', 'PUT', 'DELETE'])
 def single_post(post_id):
 
-    post_id = int(post_id)
-    # Return single post 
     if request.method == 'GET':
-
         try:
+            post = post_manager.get_by_id(post_id)
+
+            return render_template("post.html", post=post)
+
+        except PostManagerException as e:
+            data = {
+                'title': 'Post not Found',
+                'data': str(e)
+            }
+
+            return redirect(url_for('main.validate',data=data))
+
+
+    elif request.method == 'PUT':
+        try:
+            data = request.get_json()
 
             post = post_manager.get_by_id(post_id)
 
-        except PostManagerException:
-            post = {
-                'error': True,
-                'message': 'Post not found'
+            new_meta = PostMeta.from_json({'id':post.id,**data.get('metaData')})
+
+            post.content = data.get('content')
+            post.meta_data = new_meta
+
+            post_manager.save_post(post)
+
+            data = {
+                'title': 'Update Post Success',
+                'data': post
             }
 
-            return jsonify(post)
+            return redirect(url_for('main.validate',data=data))
 
-        return render_template("post.html", post=post)
+        except PostManagerException as e:
+            data = {
+                'title': 'Post not Found',
+                'data': str(e)
+            }
 
-    elif request.method == 'PUT':
+            return redirect(url_for('main.validate',data=data))
 
-        # Get post by ID
-
-        # Update post
-
-        # Save post
-
-        # Return post
-
-        data = {'updated': True,'post_id':post_id}
-
-        return redirect(url_for("success.html", data=data))
 
     elif request.method == 'DELETE':
 
-        # delete post 
+        try:
+            post_manager.delete_post(post_id)
 
-        # return boolean and post id
+            data = {'title': 'Post Deleted','data': {'post_id':post_id}}
 
-        data = {'deleted': True,'post_id':1}
+            return redirect(url_for('main.validate',data=data))
 
-        return redirect(url_for("success.html", data=data))
+        except PostManagerException as e:
+            data = {
+                'title': 'Post not deleted',
+                'data': str(e)
+            }
 
+            return redirect(url_for('main.validate',data=data))
+       
 
 @main.route("/posts/create")
 def create():
     return render_template("create.html")
 
+@main.route("/posts/update/<string:post_id>")
+def update(post_id):
+    try:
+        post = post_manager.get_by_id(post_id)
+        return render_template("update.html", post=post)
+
+
+    except PostManagerException as e:
+        data = {
+            'title': 'Post not Found',
+            'data': str(e)
+        }
+
+        return redirect(url_for('main.validate',data=data))
+
 
 @main.route("/validate")
 def validate():
-    req_data = request.args.get('data')
+    req_data = json.loads(request.args.get('data'))
 
     data = {
         'title': req_data.get('title'),
         'data':req_data.get('data')
     }
+    
     return render_template("validate.html", data=data)
 
 

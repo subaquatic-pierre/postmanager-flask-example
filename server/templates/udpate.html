@@ -17,6 +17,7 @@
         class="form-control w-100"
         id="postTitle"
         name="postTitle"
+        value="{{post.meta_data.title}}"
       />
     </div>
   </div>
@@ -36,6 +37,7 @@
         rows="5"
         id="postContent"
         name="postContent"
+        value="{{post.content}}"
       ></textarea>
     </div>
   </div>
@@ -48,9 +50,9 @@
 <script>
   const form = document.getElementById("postForm");
 
-  const postRequest = async (url, data) => {
+  const putRequest = async (url, data) => {
     return fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      method: "PUT", // *GET, POST, PUT, DELETE, etc.
       mode: "cors", // no-cors, *cors, same-origin
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       credentials: "same-origin", // include, *same-origin, omit
@@ -70,30 +72,21 @@
   };
 
   const handlePostRequest = async (data) => {
-    const createUrl = "/posts";
-
+    const postId = "{{post.id}}";
+    const updateUrl = `/posts/${postId}`;
     try {
-      const response = await postRequest(createUrl, data);
+      const response = await putRequest(updateUrl, data);
       const resData = await response.json();
 
-      if (resData.error) {
-        const data = {
-          title: "Create Failure",
-          data: error,
-        };
-        window.location.assign(generateValidateUrl(data));
-      }
-
-      const validateData = {
-        title: "Create Success",
+      const data = {
+        title: "Update Success",
         data: resData,
       };
-
-      window.location.assign(generateValidateUrl(validateData));
+      window.location.assign(generateValidateUrl(data));
     } catch (error) {
       const data = {
-        title: "Create Failure",
-        data: error,
+        title: "Update Failure",
+        data: resData,
       };
       window.location.assign(generateValidateUrl(data));
     }
