@@ -99,7 +99,7 @@ def single_post(post_id):
                 'data': post
             }
 
-            return redirect(url_for('main.validate',data=data))
+            return jsonify(data)
 
         except PostManagerException as e:
             data = {
@@ -107,7 +107,7 @@ def single_post(post_id):
                 'data': str(e)
             }
 
-            return redirect(url_for('main.validate',data=data))
+            return jsonify(data)
 
 
     elif request.method == 'DELETE':
@@ -115,9 +115,9 @@ def single_post(post_id):
         try:
             post_manager.delete_post(post_id)
 
-            data = {'title': 'Post Deleted','data': {'post_id':post_id}}
+            data = {"title": 'Post Deleted',"data": {"post_id":post_id}}
 
-            return redirect(url_for('main.validate',data=data))
+            return jsonify(data)
 
         except PostManagerException as e:
             data = {
@@ -125,7 +125,7 @@ def single_post(post_id):
                 'data': str(e)
             }
 
-            return redirect(url_for('main.validate',data=data))
+            return jsonify(data)
        
 
 @main.route("/posts/create")
@@ -148,7 +148,7 @@ def update(post_id):
         return redirect(url_for('main.validate',data=data))
 
 
-@main.route("/validate")
+@main.route("/validate", methods=["GET","PUT","POST", "DELETE"])
 def validate():
     req_data = json.loads(request.args.get('data'))
 
@@ -156,7 +156,7 @@ def validate():
         'title': req_data.get('title'),
         'data':req_data.get('data')
     }
-    
+
     return render_template("validate.html", data=data)
 
 

@@ -35,11 +35,26 @@
         <p class="card-text">{{post.content.text}}</p>
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-outline-secondary">
+            <button
+              type="button"
+              href="/posts/{{post.id}}"
+              class="btn btn-sm btn-outline-secondary"
+            >
               View
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">
+            <button
+              type="button"
+              href="/posts/update/{{post.id}}"
+              class="btn btn-sm btn-outline-secondary"
+            >
               Edit
+            </button>
+            <button
+              type="button"
+              id="{{post.id}}-deleteButton"
+              class="btn btn-sm btn-danger"
+            >
+              Delete
             </button>
           </div>
           <small
@@ -63,6 +78,7 @@
       "small.timestamp-display"
     );
 
+    // Create array with all post ids and timestamps
     allTimestampSpans.forEach((el) => {
       const timestamp = el.dataset.timestamp;
       const id = el.dataset.id;
@@ -75,13 +91,74 @@
       postData.push(post);
     });
 
+    const generateValidateUrl = (data) => {
+      const baseUrl = "/validate?data=";
+      return baseUrl + JSON.stringify(data);
+    };
+
+    const deleteRequest = (url) => {
+      return fetch(url, {
+        method: "DELETE", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      });
+    };
+
+    const handleDelete = async (postId) => {
+      const deleteUrl = `/posts/${postId}`;
+
+      try {
+        const response = await deleteRequest(deleteUrl);
+        const resData = await response.json();
+
+        if (resData.error) {
+          const data = {
+            title: "Delete Failure",
+            data: error,
+          };
+          window.location.assign(generateValidateUrl(data));
+        }
+
+        const validateData = {
+          title: "Delete Success",
+          data: resData,
+        };
+
+        window.location.assign(generateValidateUrl(validateData));
+      } catch (error) {
+        const validateData = {
+          title: "Delete Failure",
+          data: error,
+        };
+
+        window.location.assign(generateValidateUrl(validateData));
+      }
+    };
+
     postData.forEach((post) => {
+      // Update timestamp for each post
       const el = document.getElementById(`${post.id}-timestamp`);
-
       const createdAt = new Date(Number(post.timestamp) * 1000);
-
       el.innerHTML = `Created: ${createdAt.toDateString()}`;
+
+      // Add delete button handler to each post
+      const deleteButton = document.getElementById(`${post.id}-deleteButton`);
+      deleteButton.onclick = () => {
+        console.log(`delete button clicked with id ${post.id}`);
+        handleDelete(post.id);
+      };
     });
+
+    // postData.forEach((post) => {
+    //   const el = document.getElementById(`${post.id}-timestamp`);
+
+    //   const createdAt = new Date(Number(post.timestamp) * 1000);
+
+    //   el.innerHTML = `Created: ${createdAt.toDateString()}`;
+    // });
   });
 </script>
 
