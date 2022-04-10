@@ -11,7 +11,7 @@ from postmanager.post import Post
 
 main = Blueprint("main", __name__)
 
-post_manager = PostManager.setup_s3("postmanager-flask-example", "advert")
+post_manager = PostManager.setup_s3("postmanager-flask-example", "post")
 
 
 # Show home page template
@@ -56,13 +56,11 @@ def list_posts():
             cover_image = images.get("coverImage", "")
 
             if cover_image:
-                new_post.cover_image = cover_image
+                new_post.add_image(cover_image, "cover_image")
 
             post_manager.save_post(new_post)
 
             post_json = new_post.to_json()
-
-            del post_json["images"]
 
             data = {"title": "Create Post Success", "data": post_json}
 
@@ -105,7 +103,7 @@ def single_post(post_id):
             cover_image = images.get("coverImage", "")
 
             if cover_image:
-                post.cover_image = cover_image
+                post.add_image(cover_image, "cover_image")
 
             # Update post content
             post.content = form_data.get("content")
@@ -113,8 +111,6 @@ def single_post(post_id):
             post_manager.save_post(post)
 
             post_json = post.to_json()
-
-            del post_json["images"]
 
             data = {"title": "Update Post Success", "data": post_json}
 
@@ -169,11 +165,12 @@ def validate():
     return render_template("validate.html", data=data, json_dump=json.dumps(data))
 
 
-@main.route("/get-post-cover-image/<string:post_id>", methods=["GET"])
-def get_post_cover_image(post_id):
+@main.route("/get-image/<string:post_id>", methods=["GET"])
+def get_image(post_id):
     try:
+        image_name = request.args.get("imageName")
         post = post_manager.get_by_id(post_id)
-        image_src = post.get_cover_image()
+        image_src = post.get_image(image_name)
         data = {"imageSrc": image_src}
 
         return jsonify(data)

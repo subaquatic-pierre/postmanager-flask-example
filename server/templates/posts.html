@@ -29,7 +29,9 @@
       >
         <title>Placeholder</title>
         <rect width="100%" height="100%" fill="#55595c" />
-        <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{post.title}}</text>
+        <text x="50%" y="50%" fill="#eceeef" dy=".3em">
+          {{post.meta_data.title}}
+        </text>
       </svg>
 
       <img
@@ -186,7 +188,7 @@
         );
         const cardImage = document.getElementById(`${post.id}-cardImage`);
 
-        const imageUrl = `/get-post-cover-image/${post.id}`;
+        const imageUrl = `/get-image/${post.id}?imageName=cover_image`;
 
         try {
           const response = await getRequest(imageUrl);

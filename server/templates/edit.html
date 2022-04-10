@@ -8,10 +8,9 @@
 <div class="row text-center">
   <div class="col-12 mb-5">
     <img
-      src="{{post.images.cover_image}}"
-      id="coverImgOutput"
+      id="coverImage"
       width="700px"
-      class="post-cover-image"
+      class="post-cover-image d-none"
       height="300px"
     />
   </div>
@@ -84,6 +83,7 @@
     const coverImageInput = document.getElementById("formFileCoverImage");
     const postTitle = document.getElementById("postTitle");
     const postContent = document.getElementById("postContent");
+    const coverImageOutput = document.getElementById("coverImage");
 
     const putRequest = async (url, data) => {
       return fetch(url, {
@@ -184,13 +184,56 @@
       const file = event.target.files[0];
 
       if (file) {
-        coverImgOutput.classList.remove("d-none");
-        coverImgOutput.src = URL.createObjectURL(file);
+        coverImageOutput.classList.remove("d-none");
+        coverImageOutput.src = URL.createObjectURL(file);
       } else {
-        coverImgOutput.classList.add("d-none");
+        coverImageOutput.classList.add("d-none");
       }
     });
-    document.getElementById("loadingSpinner").classList.add("d-none");
+
+    // Handle get image
+    const getRequest = async (url) => {
+      return fetch(url, {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      });
+    };
+
+    const handleGetCoverImage = async () => {
+      const post_id = "{{post.meta_data.id}}";
+
+      const imageUrl = `/get-image/${post_id}?imageName=cover_image`;
+
+      try {
+        const response = await getRequest(imageUrl);
+
+        const resBody = await response.json();
+
+        const imageSrc = resBody.imageSrc;
+
+        if (imageSrc) {
+          coverImageOutput.src = imageSrc;
+          coverImageOutput.classList.remove("d-none");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handleLoading = async () => {
+      await handleGetCoverImage();
+      document.getElementById("loadingSpinner").classList.add("d-none");
+    };
+
+    handleLoading();
   });
 </script>
 

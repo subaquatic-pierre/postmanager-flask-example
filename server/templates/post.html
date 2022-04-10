@@ -8,12 +8,13 @@
       </h1>
       <div class="col-8 mb-3">
         <img
-          src="{{data.post.images.cover_image}}"
           width="700px"
           height="300px"
-          class="post-cover-image"
+          id="coverImage"
+          class="post-cover-image d-none"
         />
       </div>
+
       <div data-data="{{ json_dump }}" id="dataDiv">
         <div>
           <p class="lead text-muted">Meta Data:</p>
@@ -21,10 +22,16 @@
         </div>
 
         <div>
+          <p class="lead text-muted">Images:</p>
+          <pre id="preTagImages"></pre>
+        </div>
+
+        <div>
           <p class="lead text-muted">Content:</p>
           <pre id="preTagContent"></pre>
         </div>
       </div>
+
       <p class="text-center">
         <button id="deleteButton" class="btn btn-danger my-2">Delete</button>
         <a
@@ -93,13 +100,62 @@
     const rawData = dataDiv.dataset.data;
     const jsonData = JSON.parse(rawData);
 
+    // Set meta
     const preTagMeta = document.getElementById("preTagMeta");
     preTagMeta.innerHTML = JSON.stringify(jsonData.post.meta_data, null, 4);
 
+    // Set content
     const preTagContent = document.getElementById("preTagContent");
     preTagContent.innerHTML = JSON.stringify(jsonData.post.content, null, 4);
 
-    document.getElementById("loadingSpinner").classList.add("d-none");
+    // Set content
+    const preTagImages = document.getElementById("preTagImages");
+    preTagImages.innerHTML = JSON.stringify(jsonData.post.image_map, null, 4);
+
+    // Handle get image
+    const getRequest = async (url) => {
+      return fetch(url, {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      });
+    };
+
+    const handleGetCoverImage = async () => {
+      const post_id = "{{data.post.meta_data.id}}";
+      const coverImageOutput = document.getElementById("coverImage");
+
+      const imageUrl = `/get-image/${post_id}?imageName=cover_image`;
+
+      try {
+        const response = await getRequest(imageUrl);
+
+        const resBody = await response.json();
+
+        const imageSrc = resBody.imageSrc;
+
+        if (imageSrc) {
+          coverImageOutput.src = imageSrc;
+          coverImageOutput.classList.remove("d-none");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handleLoading = async () => {
+      await handleGetCoverImage();
+      document.getElementById("loadingSpinner").classList.add("d-none");
+    };
+
+    handleLoading();
   });
 </script>
 
