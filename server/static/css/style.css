@@ -1,5 +1,9 @@
 /* Header */
 
+body {
+    position: relative;
+}
+
 .navbar {
     margin-bottom: 20px;
 }
@@ -35,4 +39,10 @@
 
 .post-cover-image {
     object-fit: cover;
+}
+
+.loading-spinner-div {
+    position: absolute;
+    top: 120px;
+    left: 100px;
 }

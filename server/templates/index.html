@@ -8,23 +8,30 @@
     alt=""
     width="300"
   />
-  <h1 class="display-5 fw-bold">Centered hero</h1>
+  <h1 class="display-5 fw-bold">Post Manager Example</h1>
   <div class="col-lg-6 mx-auto">
     <p class="lead mb-4">
-      Quickly design and customize responsive mobile-first sites with Bootstrap,
-      the world’s most popular front-end open source toolkit, featuring Sass
-      variables and mixins, responsive grid system, extensive prebuilt
-      components, and powerful JavaScript plugins.
+      Check out our cool post post manager example. It features full CRUD
+      operations as well as displaying posts cover photos. It is not production
+      quality code but gives a developer a good idea on how the can use the
+      Python Post Manager package in their next project.
+    </p>
+    <p class="lead mb-4">
+      Please check the github repo on how to configure the manager
     </p>
     <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-      <button type="button" class="btn btn-primary btn-lg px-4 gap-3">
-        Primary button
-      </button>
-      <button type="button" class="btn btn-outline-secondary btn-lg px-4">
-        Secondary
-      </button>
+      <a href="/post" class="btn btn-primary btn-lg px-4 gap-3"> Post List </a>
+      <a href="/post/create" class="btn btn-outline-secondary btn-lg px-4">
+        Create Post
+      </a>
     </div>
   </div>
 </div>
+
+<script>
+  window.addEventListener("load", () => {
+    document.getElementById("loadingSpinner").classList.add("d-none");
+  });
+</script>
 
 {% endblock %}

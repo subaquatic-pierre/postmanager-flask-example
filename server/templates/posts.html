@@ -12,7 +12,7 @@
 
 <!-- Cards -->
 
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-5">
   {% for post in posts %}
   <div class="col">
     <div class="card shadow-sm">
@@ -118,7 +118,7 @@
     };
 
     const handleDelete = async (postId) => {
-      const deleteUrl = `/posts/${postId}`;
+      const deleteUrl = `/post/${postId}`;
 
       try {
         const response = await deleteRequest(deleteUrl);
@@ -194,7 +194,6 @@
           const resBody = await response.json();
 
           const imageSrc = resBody.imageSrc;
-          console.log(imageSrc);
 
           if (imageSrc) {
             cardImage.src = imageSrc;
@@ -207,7 +206,12 @@
       }
     };
 
-    handleGetPostImages();
+    const handleLoading = async () => {
+      await handleGetPostImages();
+      document.getElementById("loadingSpinner").classList.add("d-none");
+    };
+
+    handleLoading();
   });
 </script>
 

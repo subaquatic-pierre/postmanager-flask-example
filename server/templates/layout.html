@@ -26,15 +26,13 @@
   </head>
 
   <body>
-    <!-- Header -->
-
     <header class="site-header">
       <nav
         class="navbar navbar-expand-md navbar-dark bg-dark"
         aria-label="Fourth navbar example"
       >
         <div class="container">
-          <a class="navbar-brand" href="/">S3 Post Manager Example</a>
+          <a class="navbar-brand" href="/">Post Manager Example</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -71,6 +69,13 @@
         </div>
       </nav>
     </header>
+
+    <!-- Header -->
+    <div id="loadingSpinner" class="loading-spinner-div">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
     <main role="main">
       <div class="container">{% block main %}{% endblock %}</div>

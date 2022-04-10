@@ -9,11 +9,6 @@
         <pre id="preTag"></pre>
       </div>
       <p class="text-center">
-        {% if data.deleted != True %}
-        <a href="/post/{{data.data.meta_data.id}}" class="btn btn-primary my-2"
-          >View</a
-        >
-        {% endif %}
         <a href="/" class="btn btn-primary my-2">Home</a>
         <a href="/post" class="btn btn-secondary my-2">Posts</a>
       </p>
@@ -24,10 +19,13 @@
 <script>
   window.addEventListener("load", () => {
     const dataDiv = document.getElementById("dataDiv");
-    const data = dataDiv.dataset.data;
+    const rawData = dataDiv.dataset.data;
+    const jsonData = JSON.parse(rawData);
 
     const preTag = document.getElementById("preTag");
-    preTag.innerHTML = JSON.stringify(JSON.parse(data).data, null, 4);
+    preTag.innerHTML = JSON.stringify(jsonData.data, null, 4);
+
+    document.getElementById("loadingSpinner").classList.add("d-none");
   });
 </script>
 

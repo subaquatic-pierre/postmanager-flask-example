@@ -53,7 +53,7 @@ def list_posts():
 
             images = form_data.get("images")
 
-            cover_image = images.get("coverImage")
+            cover_image = images.get("coverImage", "")
 
             if cover_image:
                 new_post.cover_image = cover_image
@@ -102,7 +102,8 @@ def single_post(post_id):
 
             # Upddate image
             images = form_data.get("images")
-            cover_image = images.get("coverImage")
+            cover_image = images.get("coverImage", "")
+
             if cover_image:
                 post.cover_image = cover_image
 
