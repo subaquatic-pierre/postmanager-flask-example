@@ -6,14 +6,12 @@ from flask import request, render_template, jsonify
 from time import time
 
 from postmanager.manager import PostManager
-from postmanager.proxy import BucketProxy
 from postmanager.exception import PostManagerException
-from postmanager.meta import PostMeta
 from postmanager.post import Post
 
 main = Blueprint("main", __name__)
 
-post_manager = PostManager.setup("postmanager-flask-example", "advert")
+post_manager = PostManager.setup_s3("postmanager-flask-example", "advert")
 
 
 # Show home page template

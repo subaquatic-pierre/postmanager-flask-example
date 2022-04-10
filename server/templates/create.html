@@ -1,8 +1,19 @@
 {% extends 'layout.html' %} {% block main %}
 
-<div class="py-5 text-center">
+<div class="py-3 text-center">
   <h2>Create Post</h2>
   <p class="lead">Create new post below</p>
+</div>
+
+<div class="row text-center">
+  <div class="col-12 mb-3">
+    <img
+      id="coverImgOutput"
+      width="600px"
+      class="post-cover-image d-none"
+      height="300px"
+    />
+  </div>
 </div>
 
 <form class="row g-3" id="postForm">
@@ -17,6 +28,16 @@
         class="form-control w-100"
         id="postTitle"
         name="postTitle"
+      />
+    </div>
+    <div class="my-3">
+      <label for="formFile" class="form-label">Cover Photo</label>
+      <input
+        accept="image/jpeg, image/png"
+        name="formFileCoverImage"
+        class="form-control"
+        type="file"
+        id="formFileCoverImage"
       />
     </div>
   </div>
@@ -46,78 +67,113 @@
 </form>
 
 <script>
-  const form = document.getElementById("postForm");
+  window.addEventListener("load", () => {
+    // Get elements
+    const postTitle = document.getElementById("postTitle");
+    const postContent = document.getElementById("postContent");
+    const coverImageInput = document.getElementById("formFileCoverImage");
+    const coverImgOutput = document.getElementById("coverImgOutput");
+    const form = document.getElementById("postForm");
 
-  const postRequest = async (url, data) => {
-    return fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      mode: "cors", // no-cors, *cors, same-origin
-      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: "same-origin", // include, *same-origin, omit
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      redirect: "follow", // manual, *follow, error
-      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(data), // body data type must match "Content-Type" header
-    });
-  };
+    const postRequest = async (url, data) => {
+      return fetch(url, {
+        method: "POST", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
+      });
+    };
 
-  const generateValidateUrl = (data) => {
-    const baseUrl = "/validate?data=";
-    return baseUrl + JSON.stringify(data);
-  };
+    const generateValidateUrl = (data) => {
+      const baseUrl = "/validate?data=";
+      return baseUrl + JSON.stringify(data);
+    };
 
-  const handlePostRequest = async (data) => {
-    const createUrl = "/posts";
+    const handlePostRequest = async (data) => {
+      const createUrl = "/posts";
 
-    try {
-      const response = await postRequest(createUrl, data);
-      const resData = await response.json();
+      try {
+        const response = await postRequest(createUrl, data);
+        const resData = await response.json();
 
-      if (resData.error) {
-        const data = {
+        if (resData.error) {
+          const data = {
+            title: resData.title,
+            data: resData.data,
+          };
+          window.location.assign(generateValidateUrl(data));
+        }
+
+        const validateData = {
           title: resData.title,
           data: resData.data,
         };
+
+        window.location.assign(generateValidateUrl(validateData));
+      } catch (error) {
+        const data = {
+          title: "Create Failure",
+          data: error,
+        };
         window.location.assign(generateValidateUrl(data));
       }
-
-      const validateData = {
-        title: resData.title,
-        data: resData.data,
-      };
-
-      window.location.assign(generateValidateUrl(validateData));
-    } catch (error) {
-      const data = {
-        title: "Create Failure",
-        data: error,
-      };
-      window.location.assign(generateValidateUrl(data));
-    }
-  };
-
-  const handleSubmitClick = (e) => {
-    event.preventDefault();
-
-    const postTitle = document.getElementById("postTitle");
-    const postContent = document.getElementById("postContent");
-
-    const data = {
-      metaData: {
-        title: postTitle.value,
-      },
-      content: {
-        text: postContent.value,
-      },
     };
 
-    handlePostRequest(data);
-  };
+    const encodeImage = (file) => {
+      const reader = new FileReader();
 
-  form.addEventListener("submit", handleSubmitClick);
+      reader.readAsDataURL(file);
+
+      return new Promise((resolve) => {
+        reader.onloadend = function () {
+          resolve(reader.result);
+        };
+      });
+    };
+
+    const handleSubmitClick = async (e) => {
+      event.preventDefault();
+
+      const coverImg = coverImageInput.files[0];
+
+      const encodedImage = await encodeImage(coverImg);
+
+      const data = {
+        metaData: {
+          title: postTitle.value,
+        },
+        content: {
+          text: postContent.value,
+        },
+        images: {
+          coverImage: encodedImage,
+        },
+      };
+
+      handlePostRequest(data);
+    };
+
+    form.addEventListener("submit", handleSubmitClick);
+
+    // Add image to page on input change
+    coverImageInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+
+      if (file) {
+        coverImgOutput.classList.remove("d-none");
+        coverImgOutput.src = URL.createObjectURL(file);
+      } else {
+        coverImgOutput.classList.add("d-none");
+      }
+    });
+  });
 </script>
 
 {% endblock main %}
