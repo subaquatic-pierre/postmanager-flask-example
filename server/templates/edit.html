@@ -1,16 +1,17 @@
 {% extends 'layout.html' %} {% block main %}
 
-<div class="py-3 text-center">
-  <h2>Create Post</h2>
-  <p class="lead">Create new post below</p>
+<div class="py-5 text-center">
+  <h2>Update Post</h2>
+  <p class="lead">Edit post below</p>
 </div>
 
 <div class="row text-center">
   <div class="col-12 mb-5">
     <img
+      src="{{post.images.cover_image}}"
       id="coverImgOutput"
-      width="600px"
-      class="post-cover-image d-none"
+      width="700px"
+      class="post-cover-image"
       height="300px"
     />
   </div>
@@ -28,6 +29,7 @@
         class="form-control w-100"
         id="postTitle"
         name="postTitle"
+        value="{{post.meta_data.title}}"
       />
     </div>
 
@@ -65,7 +67,9 @@
         rows="5"
         id="postContent"
         name="postContent"
-      ></textarea>
+      >
+{{post.content.text}}</textarea
+      >
     </div>
   </div>
 
@@ -76,16 +80,14 @@
 
 <script>
   window.addEventListener("load", () => {
-    // Get elements
+    const form = document.getElementById("postForm");
+    const coverImageInput = document.getElementById("formFileCoverImage");
     const postTitle = document.getElementById("postTitle");
     const postContent = document.getElementById("postContent");
-    const coverImageInput = document.getElementById("formFileCoverImage");
-    const coverImgOutput = document.getElementById("coverImgOutput");
-    const form = document.getElementById("postForm");
 
-    const postRequest = async (url, data) => {
+    const putRequest = async (url, data) => {
       return fetch(url, {
-        method: "POST", // *GET, POST, PUT, DELETE, etc.
+        method: "PUT", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, *cors, same-origin
         cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
         credentials: "same-origin", // include, *same-origin, omit
@@ -104,36 +106,6 @@
       return baseUrl + JSON.stringify(data);
     };
 
-    const handlePostRequest = async (data) => {
-      const createUrl = "/post";
-
-      try {
-        const response = await postRequest(createUrl, data);
-        const resData = await response.json();
-
-        if (resData.error) {
-          const data = {
-            title: resData.title,
-            data: resData.data,
-          };
-          window.location.assign(generateValidateUrl(data));
-        }
-
-        const validateData = {
-          title: resData.title,
-          data: resData.data,
-        };
-
-        window.location.assign(generateValidateUrl(validateData));
-      } catch (error) {
-        const data = {
-          title: "Create Failure",
-          data: error,
-        };
-        window.location.assign(generateValidateUrl(data));
-      }
-    };
-
     const encodeImage = (file) => {
       const reader = new FileReader();
 
@@ -146,8 +118,42 @@
       });
     };
 
+    const handlePutRequest = async (data) => {
+      const postId = "{{post.meta_data.id}}";
+      const updateUrl = `/post/${postId}`;
+
+      try {
+        const response = await putRequest(updateUrl, data);
+        const resData = await response.json();
+
+        if (resData.error) {
+          const data = {
+            title: resData.title,
+            data: resData.data,
+          };
+
+          window.location.assign(generateValidateUrl(data));
+        }
+
+        const validateData = {
+          title: resData.title,
+          data: resData.data,
+        };
+
+        window.location.assign(generateValidateUrl(validateData));
+      } catch (error) {
+        const errorData = {
+          title: "Update Failure",
+          data: error,
+        };
+
+        window.location.assign(generateValidateUrl(errorData));
+      }
+    };
+
     const handleSubmitClick = async (e) => {
       event.preventDefault();
+
       let encodedImage = "";
 
       const coverImg = coverImageInput.files[0];
@@ -168,7 +174,7 @@
         },
       };
 
-      handlePostRequest(data);
+      handlePutRequest(data);
     };
 
     form.addEventListener("submit", handleSubmitClick);
@@ -176,12 +182,6 @@
     // Add image to page on input change
     coverImageInput.addEventListener("change", (event) => {
       const file = event.target.files[0];
-
-      if (file.size > 500000) {
-        alert("Please upload file smaller than 500kb");
-        coverImageInput.value = "";
-        return;
-      }
 
       if (file) {
         coverImgOutput.classList.remove("d-none");

@@ -1,19 +1,34 @@
 {% extends 'layout.html' %} {% block main %}
 
 <section class="py-5 container">
-  <div class="row py-lg-5">
-    <div class="col-lg-6 col-md-8 mx-auto">
+  <div class="row py-lg-5 d-flex justify-content-center">
+    <div class="col-8">
       <h1 class="fw-light text-center">
         Post Title: {{data.post.meta_data.title}}
       </h1>
-      <p class="lead text-muted">Data:</p>
+      <div class="col-8 mb-3">
+        <img
+          src="{{data.post.images.cover_image}}"
+          width="700px"
+          height="300px"
+          class="post-cover-image"
+        />
+      </div>
       <div data-data="{{ json_dump }}" id="dataDiv">
-        <pre id="preTag"></pre>
+        <div>
+          <p class="lead text-muted">Meta Data:</p>
+          <pre id="preTagMeta"></pre>
+        </div>
+
+        <div>
+          <p class="lead text-muted">Content:</p>
+          <pre id="preTagContent"></pre>
+        </div>
       </div>
       <p class="text-center">
         <button id="deleteButton" class="btn btn-danger my-2">Delete</button>
         <a
-          href="/posts/update/{{data.post.meta_data.id}}"
+          href="/post/{{data.post.meta_data.id}}/edit"
           class="btn btn-secondary my-2"
           >Edit</a
         >
@@ -75,10 +90,14 @@
 
   window.addEventListener("load", () => {
     const dataDiv = document.getElementById("dataDiv");
-    const data = dataDiv.dataset.data;
+    const rawData = dataDiv.dataset.data;
+    const jsonData = JSON.parse(rawData);
 
-    const preTag = document.getElementById("preTag");
-    preTag.innerHTML = JSON.stringify(JSON.parse(data).post, null, 4);
+    const preTagMeta = document.getElementById("preTagMeta");
+    preTagMeta.innerHTML = JSON.stringify(jsonData.post.meta_data, null, 4);
+
+    const preTagContent = document.getElementById("preTagContent");
+    preTagContent.innerHTML = JSON.stringify(jsonData.post.content, null, 4);
   });
 </script>
 

@@ -9,8 +9,13 @@
         <pre id="preTag"></pre>
       </div>
       <p class="text-center">
+        {% if data.deleted != True %}
+        <a href="/post/{{data.data.meta_data.id}}" class="btn btn-primary my-2"
+          >View</a
+        >
+        {% endif %}
         <a href="/" class="btn btn-primary my-2">Home</a>
-        <a href="/posts" class="btn btn-secondary my-2">Posts</a>
+        <a href="/post" class="btn btn-secondary my-2">Posts</a>
       </p>
     </div>
   </div>

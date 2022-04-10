@@ -17,6 +17,7 @@
   <div class="col">
     <div class="card shadow-sm">
       <svg
+        id="{{post.id}}-svgPlaceholder"
         class="bd-placeholder-img card-img-top"
         width="100%"
         height="225"
@@ -31,20 +32,29 @@
         <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{post.title}}</text>
       </svg>
 
+      <img
+        id="{{post.id}}-cardImage"
+        width="100%"
+        height="225"
+        class="card-img-top d-none"
+        alt="cardImage"
+      />
+
       <div class="card-body">
+        <p class="lead">{{post.meta_data.title}}</p>
         <p class="card-text">{{post.content.text}}</p>
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
             <a
               type="button"
-              href="/posts/{{post.id}}"
+              href="/post/{{post.id}}"
               class="btn btn-sm btn-outline-secondary"
             >
               View
             </a>
             <a
               type="button"
-              href="/posts/update/{{post.id}}"
+              href="/post/{{post.meta_data.id}}/edit"
               class="btn btn-sm btn-outline-secondary"
             >
               Edit
@@ -150,6 +160,54 @@
         handleDelete(post.id);
       };
     });
+
+    const getRequest = async (url) => {
+      return fetch(url, {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      });
+    };
+
+    const handleGetPostImages = async () => {
+      // Add image to each post card
+      for (let i = 0; i < postData.length; i++) {
+        const post = postData[i];
+        // Update timestamp for each post
+        const svgPlaceholder = document.getElementById(
+          `${post.id}-svgPlaceholder`
+        );
+        const cardImage = document.getElementById(`${post.id}-cardImage`);
+
+        const imageUrl = `/get-post-cover-image/${post.id}`;
+
+        try {
+          const response = await getRequest(imageUrl);
+
+          const resBody = await response.json();
+
+          const imageSrc = resBody.imageSrc;
+          console.log(imageSrc);
+
+          if (imageSrc) {
+            cardImage.src = imageSrc;
+            svgPlaceholder.classList.add("d-none");
+            cardImage.classList.remove("d-none");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    handleGetPostImages();
   });
 </script>
 

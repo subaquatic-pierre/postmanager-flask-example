@@ -22,7 +22,7 @@ def home():
 
 
 # Posts route
-@main.route("/posts", methods=["GET", "POST"])
+@main.route("/post", methods=["GET", "POST"])
 def list_posts():
     if request.method == "GET":
 
@@ -51,9 +51,20 @@ def list_posts():
             post_meta_data = post_manager.create_meta(new_meta_dict)
             new_post = post_manager.create_post(post_meta_data, post_content)
 
+            images = form_data.get("images")
+
+            cover_image = images.get("coverImage")
+
+            if cover_image:
+                new_post.cover_image = cover_image
+
             post_manager.save_post(new_post)
 
-            data = {"title": "Create Post Success", "data": new_post.to_json()}
+            post_json = new_post.to_json()
+
+            del post_json["images"]
+
+            data = {"title": "Create Post Success", "data": post_json}
 
             return jsonify(data)
 
@@ -64,7 +75,7 @@ def list_posts():
 
 
 # Post with ID route
-@main.route("/posts/<string:post_id>", methods=["GET", "PUT", "DELETE"])
+@main.route("/post/<string:post_id>", methods=["GET", "PUT", "DELETE"])
 def single_post(post_id):
 
     if request.method == "GET":
@@ -89,11 +100,22 @@ def single_post(post_id):
             # Update post meta
             post.meta_data.update(form_data.get("metaData"))
 
+            # Upddate image
+            images = form_data.get("images")
+            cover_image = images.get("coverImage")
+            if cover_image:
+                post.cover_image = cover_image
+
             # Update post content
             post.content = form_data.get("content")
+
             post_manager.save_post(post)
 
-            data = {"title": "Update Post Success", "data": post.to_json()}
+            post_json = post.to_json()
+
+            del post_json["images"]
+
+            data = {"title": "Update Post Success", "data": post_json}
 
             return jsonify(data)
 
@@ -120,16 +142,16 @@ def single_post(post_id):
             return jsonify(data)
 
 
-@main.route("/posts/create")
+@main.route("/post/create")
 def create():
     return render_template("create.html")
 
 
-@main.route("/posts/update/<string:post_id>")
+@main.route("/post/<string:post_id>/edit")
 def update(post_id):
     try:
         post = post_manager.get_by_id(post_id)
-        return render_template("update.html", post=post)
+        return render_template("edit.html", post=post.to_json())
 
     except PostManagerException as e:
         data = {"title": "Post not Found", "data": str(e)}
@@ -144,3 +166,15 @@ def validate():
     data = {"title": req_data.get("title"), "data": req_data.get("data")}
 
     return render_template("validate.html", data=data, json_dump=json.dumps(data))
+
+
+@main.route("/get-post-cover-image/<string:post_id>", methods=["GET"])
+def get_post_cover_image(post_id):
+    try:
+        post = post_manager.get_by_id(post_id)
+        image_src = post.get_cover_image()
+        data = {"imageSrc": image_src}
+
+        return jsonify(data)
+    except:
+        return jsonify({"imageSrc": ""})
