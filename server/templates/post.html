@@ -132,7 +132,7 @@
       const post_id = "{{data.post.meta_data.id}}";
       const coverImageOutput = document.getElementById("coverImage");
 
-      const imageUrl = `/get-image/${post_id}?imageName=cover_image`;
+      const imageUrl = `/get-image?postId=${post_id}&imageName=cover_image`;
 
       try {
         const response = await getRequest(imageUrl);

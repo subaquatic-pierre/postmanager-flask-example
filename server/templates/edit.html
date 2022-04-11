@@ -210,7 +210,7 @@
     const handleGetCoverImage = async () => {
       const post_id = "{{post.meta_data.id}}";
 
-      const imageUrl = `/get-image/${post_id}?imageName=cover_image`;
+      const imageUrl = `/get-image?postId=${post_id}&imageName=cover_image`;
 
       try {
         const response = await getRequest(imageUrl);

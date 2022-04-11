@@ -165,12 +165,15 @@ def validate():
     return render_template("validate.html", data=data, json_dump=json.dumps(data))
 
 
-@main.route("/get-image/<string:post_id>", methods=["GET"])
-def get_image(post_id):
+@main.route("/get-image", methods=["GET"])
+def get_image():
     try:
+        post_id = request.args.get("postId")
         image_name = request.args.get("imageName")
         post = post_manager.get_by_id(post_id)
+
         image_src = post.get_image(image_name)
+
         data = {"imageSrc": image_src}
 
         return jsonify(data)

@@ -188,7 +188,7 @@
         );
         const cardImage = document.getElementById(`${post.id}-cardImage`);
 
-        const imageUrl = `/get-image/${post.id}?imageName=cover_image`;
+        const imageUrl = `/get-image?postId=${post.id}&imageName=cover_image`;
 
         try {
           const response = await getRequest(imageUrl);
@@ -196,6 +196,8 @@
           const resBody = await response.json();
 
           const imageSrc = resBody.imageSrc;
+
+          console.log(imageSrc);
 
           if (imageSrc) {
             cardImage.src = imageSrc;
