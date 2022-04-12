@@ -188,19 +188,19 @@
         );
         const cardImage = document.getElementById(`${post.id}-cardImage`);
 
-        const imageUrl = `/get-image?postId=${post.id}&imageName=cover_image`;
+        const imageUrl = `/get-media?postId=${post.id}&mediaName=cover_image`;
 
         try {
           const response = await getRequest(imageUrl);
 
           const resBody = await response.json();
 
-          const imageSrc = resBody.imageSrc;
+          const mediaSrc = resBody.mediaSrc;
 
-          console.log(imageSrc);
+          console.log(mediaSrc);
 
-          if (imageSrc) {
-            cardImage.src = imageSrc;
+          if (mediaSrc) {
+            cardImage.src = mediaSrc;
             svgPlaceholder.classList.add("d-none");
             cardImage.classList.remove("d-none");
           }

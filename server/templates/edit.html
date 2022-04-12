@@ -14,6 +14,10 @@
       height="300px"
     />
   </div>
+  <div>
+    <button class="'btn btn-danger" id="deleteImageButton">Delete Image</button>
+    <div id="deleteImageValue"></div>
+  </div>
 </div>
 
 <form class="row g-3" id="postForm">
@@ -38,7 +42,7 @@
 
     <div class="my-3">
       <div class="col-12">
-        <h3>Images</h3>
+        <h3>Media</h3>
       </div>
       <label for="formFile" class="form-label">Cover Photo</label>
       <input
@@ -79,11 +83,19 @@
 
 <script>
   window.addEventListener("load", () => {
+    let deleteImage = false;
     const form = document.getElementById("postForm");
     const coverImageInput = document.getElementById("formFileCoverImage");
     const postTitle = document.getElementById("postTitle");
     const postContent = document.getElementById("postContent");
     const coverImageOutput = document.getElementById("coverImage");
+
+    document
+      .getElementById("deleteImageButton")
+      .addEventListener("click", () => {
+        deleteImage = !deleteImage;
+        document.getElementById("deleteImageValue").innerHTML = deleteImage;
+      });
 
     const putRequest = async (url, data) => {
       return fetch(url, {
@@ -172,6 +184,7 @@
         images: {
           coverImage: encodedImage,
         },
+        deleteImage: deleteImage,
       };
 
       handlePutRequest(data);
@@ -210,17 +223,17 @@
     const handleGetCoverImage = async () => {
       const post_id = "{{post.meta_data.id}}";
 
-      const imageUrl = `/get-image?postId=${post_id}&imageName=cover_image`;
+      const imageUrl = `/get-media?postId=${post_id}&mediaName=cover_image`;
 
       try {
         const response = await getRequest(imageUrl);
 
         const resBody = await response.json();
 
-        const imageSrc = resBody.imageSrc;
+        const mediaSrc = resBody.mediaSrc;
 
-        if (imageSrc) {
-          coverImageOutput.src = imageSrc;
+        if (mediaSrc) {
+          coverImageOutput.src = mediaSrc;
           coverImageOutput.classList.remove("d-none");
         }
       } catch (error) {

@@ -22,8 +22,8 @@
         </div>
 
         <div>
-          <p class="lead text-muted">Images:</p>
-          <pre id="preTagImages"></pre>
+          <p class="lead text-muted">Media:</p>
+          <pre id="preTagMedia"></pre>
         </div>
 
         <div>
@@ -109,8 +109,8 @@
     preTagContent.innerHTML = JSON.stringify(jsonData.post.content, null, 4);
 
     // Set content
-    const preTagImages = document.getElementById("preTagImages");
-    preTagImages.innerHTML = JSON.stringify(jsonData.post.image_map, null, 4);
+    const preTagMedia = document.getElementById("preTagMedia");
+    preTagMedia.innerHTML = JSON.stringify(jsonData.post.media_index, null, 4);
 
     // Handle get image
     const getRequest = async (url) => {
@@ -132,17 +132,17 @@
       const post_id = "{{data.post.meta_data.id}}";
       const coverImageOutput = document.getElementById("coverImage");
 
-      const imageUrl = `/get-image?postId=${post_id}&imageName=cover_image`;
+      const imageUrl = `/get-media?postId=${post_id}&mediaName=cover_image`;
 
       try {
         const response = await getRequest(imageUrl);
 
         const resBody = await response.json();
 
-        const imageSrc = resBody.imageSrc;
+        const mediaSrc = resBody.mediaSrc;
 
-        if (imageSrc) {
-          coverImageOutput.src = imageSrc;
+        if (mediaSrc) {
+          coverImageOutput.src = mediaSrc;
           coverImageOutput.classList.remove("d-none");
         }
       } catch (error) {

@@ -43,23 +43,25 @@ def list_posts():
 
             # Get raw data from request
             form_meta_data = form_data.get("metaData", {"title": "Unknown title"})
-            post_title = form_meta_data.get("title")
             post_content = form_data.get("content", {"Header": "Unkown Content"})
 
+            # Create meta dict
+            post_title = form_meta_data.get("title")
             new_meta_dict = {"title": post_title, "timestamp": int(time())}
 
-            post_meta_data = post_manager.create_meta(new_meta_dict)
-            new_post = post_manager.create_post(post_meta_data, post_content)
+            # Create post
+            new_post = post_manager.new_post(new_meta_dict, post_content)
 
+            # Get media
             images = form_data.get("images")
-
             cover_image = images.get("coverImage", "")
 
+            # Add media
             if cover_image:
-                new_post.add_image(cover_image, "cover_image")
+                new_post.add_media(cover_image, "cover_image")
 
+            # Save post
             post_manager.save_post(new_post)
-
             post_json = new_post.to_json()
 
             data = {"title": "Create Post Success", "data": post_json}
@@ -95,18 +97,21 @@ def single_post(post_id):
 
             post = post_manager.get_by_id(post_id)
 
-            # Update post meta
-            post.meta_data.update(form_data.get("metaData"))
+            # Update post data
+            post.update_meta_data(form_data["metaData"])
+            post.update_content(form_data["content"])
 
-            # Upddate image
+            # Update media
             images = form_data.get("images")
             cover_image = images.get("coverImage", "")
 
             if cover_image:
-                post.add_image(cover_image, "cover_image")
+                post.add_media(cover_image, "cover_image")
+
+            if form_data.get("deleteImage"):
+                post.delete_media("cover_image")
 
             # Update post content
-            post.content = form_data.get("content")
 
             post_manager.save_post(post)
 
@@ -165,17 +170,18 @@ def validate():
     return render_template("validate.html", data=data, json_dump=json.dumps(data))
 
 
-@main.route("/get-image", methods=["GET"])
+@main.route("/get-media", methods=["GET"])
 def get_image():
     try:
         post_id = request.args.get("postId")
-        image_name = request.args.get("imageName")
+        media_name = request.args.get("mediaName")
         post = post_manager.get_by_id(post_id)
 
-        image_src = post.get_image(image_name)
+        media_src = post.get_media(media_name)
 
-        data = {"imageSrc": image_src}
+        data = {"mediaSrc": media_src}
 
         return jsonify(data)
-    except:
-        return jsonify({"imageSrc": ""})
+    except Exception as e:
+
+        return jsonify({"mediaSrc": f"{str(e)}"})
