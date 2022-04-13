@@ -11,7 +11,7 @@ from postmanager.post import Post
 
 main = Blueprint("main", __name__)
 
-post_manager = PostManager.setup_s3("postmanager-flask-example", "post")
+post_manager = PostManager.setup_local()
 
 
 # Show home page template
